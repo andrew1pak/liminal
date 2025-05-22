@@ -59,3 +59,50 @@
   <script src="script.js"></script>
 </body>
 </html>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const welcome = document.querySelector(".black-background");
+    const viewer = document.querySelector(".image-container");
+    const centeredText = document.querySelector(".centered-text");
+
+    function setCookie(name, value, days) {
+      const d = new Date();
+      d.setTime(d.getTime() + (days*24*60*60*1000));
+      document.cookie = `${name}=${value};expires=${d.toUTCString()};path=/`;
+    }
+
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    // ✅ If cookie exists, show lock message
+    if (getCookie("locked") === "true") {
+      document.body.innerHTML = `
+        <div id="lockedMessage" style="
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          height: 100vh;
+          width: 100vw;
+          background: black;
+          color: white;
+          font-size: 1.5em;
+          font-family: 'Jacquarda Bastarda 9', monospace;
+        ">
+          <span>This place remembers you, but you won't remember it.</span>
+        </div>`;
+      return;
+    }
+
+    // 🖱 First click sets cookie
+    centeredText.addEventListener("click", () => {
+      setCookie("locked", "true", 365); // 1 year lock
+      welcome.style.display = "none";
+      viewer.style.display = "block";
+    });
+  });
+</script>
