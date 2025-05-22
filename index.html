@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>???</title>
+
+  <!-- Styles & Font -->
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Jacquarda+Bastarda+9&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      background-color: black;
+      color: white;
+      font-family: 'Jacquarda Bastarda 9', monospace;
+      font-weight: normal;
+      position: relative;
+    }
+
+    #lockedMessage {
+      display: none;
+      background: black;
+      height: 100vh;
+      width: 100vw;
+      font-size: 1.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 999;
+      user-select: none;
+    }
+
+    .lockedText {
+      color: white;
+      text-shadow: none;
+      transition: none;
+      pointer-events: none;
+    }
+
+    .black-background {
+      display: flex;
+      height: 100vh;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 2em;
+      font-weight: normal;
+    }
+
+    .image-container img {
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Lock screen message -->
+  <div id="lockedMessage">
+    <span class="lockedText">You were here once, that is enough.</span>
+  </div>
+
+  <!-- Welcome screen -->
+  <div class="black-background">
+    <p class="centered-text">welcome</p>
+  </div>
+
+  <!-- Image viewer -->
+  <div class="image-container" style="display: none;">
+    <img id="imageDisplay" src="" alt="Click to continue">
+  </div>
+
+  <!-- Your image script -->
+  <script src="script.js"></script>
+
+  <!-- 🔐 Lock + DevTools Unlock -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const lockedMessage = document.getElementById("lockedMessage");
+      const welcome = document.querySelector(".black-background");
+      const imageViewer = document.querySelector(".image-container");
+
+      let isDevToolsOpen = false;
+
+      const detectDevTools = () => {
+        const threshold = 160;
+        return (
+          window.outerWidth - window.innerWidth > threshold ||
+          window.outerHeight - window.innerHeight > threshold
+        );
+      };
+
+      const checkAccess = () => {
+        const hasVisited = localStorage.getItem("hasVisited") === "true";
+
+        if (hasVisited && !isDevToolsOpen) {
+          welcome.style.display = "none";
+          imageViewer.style.display = "none";
+          lockedMessage.style.display = "flex";
+        }
+
+        document.querySelector(".centered-text").addEventListener("click", () => {
+          localStorage.setItem("hasVisited", "true");
+        });
+      };
+
+      setInterval(() => {
+        const nowOpen = detectDevTools();
+        if (nowOpen && !isDevToolsOpen) {
+          console.log("🔓 DevTools detected. Unlocking...");
+          localStorage.removeItem("hasVisited");
+          location.reload();
+        }
+        isDevToolsOpen = nowOpen;
+      }, 1000);
+
+      checkAccess();
+    });
+  </script>
+</body>
+</html>
