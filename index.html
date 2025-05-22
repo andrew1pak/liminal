@@ -18,30 +18,6 @@
       position: relative;
     }
 
-    #lockedMessage {
-      display: none;
-      background: black;
-      height: 100vh;
-      width: 100vw;
-      font-size: 1.5em;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 999;
-      user-select: none;
-    }
-
-    .lockedText {
-      color: white;
-      text-shadow: none;
-      transition: none;
-      pointer-events: none;
-    }
-
     .black-background {
       display: flex;
       height: 100vh;
@@ -50,6 +26,14 @@
       cursor: pointer;
       font-size: 2em;
       font-weight: normal;
+    }
+
+    .centered-text {
+      letter-spacing: 0.15em;
+    }
+
+    .image-container {
+      display: none;
     }
 
     .image-container img {
@@ -61,63 +45,17 @@
 </head>
 <body>
 
-  <!-- Lock screen message -->
-  <div id="lockedMessage">
-    <span class="lockedText">You were here once, that is enough.</span>
-  </div>
-
   <!-- Welcome screen -->
   <div class="black-background">
     <p class="centered-text">welcome</p>
   </div>
 
   <!-- Image viewer -->
-  <div class="image-container" style="display: none;">
+  <div class="image-container">
     <img id="imageDisplay" src="" alt="Click to continue">
   </div>
 
   <!-- Your image script -->
   <script src="script.js"></script>
-
- <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const lockedMessage = document.getElementById("lockedMessage");
-    const welcomeScreen = document.querySelector(".black-background");
-    const imageViewer = document.querySelector(".image-container");
-    const centeredText = document.querySelector(".centered-text");
-
-    // ✅ Only lock them out *after* clicking welcome
-    const hasVisited = localStorage.getItem("hasVisited") === "true";
-    const devToolsBypass = () => {
-      const threshold = 160;
-      return (
-        window.outerWidth - window.innerWidth > threshold ||
-        window.outerHeight - window.innerHeight > threshold
-      );
-    };
-
-    if (hasVisited && !devToolsBypass()) {
-      // Already visited — show lock screen
-      welcomeScreen.style.display = "none";
-      imageViewer.style.display = "none";
-      lockedMessage.style.display = "flex";
-      return;
-    }
-
-    // ✅ Unlock via DevTools
-    setInterval(() => {
-      if (devToolsBypass()) {
-        localStorage.removeItem("hasVisited");
-        console.log("🔓 DevTools detected. Unlocking...");
-        location.reload();
-      }
-    }, 1000);
-
-    // 👁 First click = grant access, then lock future visits
-    centeredText.addEventListener("click", () => {
-      localStorage.setItem("hasVisited", "true");
-      welcomeScreen.style.display = "none";
-      imageViewer.style.display = "block";
-    });
-  });
-</script>
+</body>
+</html>
