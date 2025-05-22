@@ -79,49 +79,45 @@
   <!-- Your image script -->
   <script src="script.js"></script>
 
-  <!-- 🔐 Lock + DevTools Unlock -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const lockedMessage = document.getElementById("lockedMessage");
-      const welcome = document.querySelector(".black-background");
-      const imageViewer = document.querySelector(".image-container");
+ <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const lockedMessage = document.getElementById("lockedMessage");
+    const welcomeScreen = document.querySelector(".black-background");
+    const imageViewer = document.querySelector(".image-container");
+    const centeredText = document.querySelector(".centered-text");
 
-      let isDevToolsOpen = false;
+    // ✅ Only lock them out *after* clicking welcome
+    const hasVisited = localStorage.getItem("hasVisited") === "true";
+    const devToolsBypass = () => {
+      const threshold = 160;
+      return (
+        window.outerWidth - window.innerWidth > threshold ||
+        window.outerHeight - window.innerHeight > threshold
+      );
+    };
 
-      const detectDevTools = () => {
-        const threshold = 160;
-        return (
-          window.outerWidth - window.innerWidth > threshold ||
-          window.outerHeight - window.innerHeight > threshold
-        );
-      };
+    if (hasVisited && !devToolsBypass()) {
+      // Already visited — show lock screen
+      welcomeScreen.style.display = "none";
+      imageViewer.style.display = "none";
+      lockedMessage.style.display = "flex";
+      return;
+    }
 
-      const checkAccess = () => {
-        const hasVisited = localStorage.getItem("hasVisited") === "true";
+    // ✅ Unlock via DevTools
+    setInterval(() => {
+      if (devToolsBypass()) {
+        localStorage.removeItem("hasVisited");
+        console.log("🔓 DevTools detected. Unlocking...");
+        location.reload();
+      }
+    }, 1000);
 
-        if (hasVisited && !isDevToolsOpen) {
-          welcome.style.display = "none";
-          imageViewer.style.display = "none";
-          lockedMessage.style.display = "flex";
-        }
-
-        document.querySelector(".centered-text").addEventListener("click", () => {
-          localStorage.setItem("hasVisited", "true");
-        });
-      };
-
-      setInterval(() => {
-        const nowOpen = detectDevTools();
-        if (nowOpen && !isDevToolsOpen) {
-          console.log("🔓 DevTools detected. Unlocking...");
-          localStorage.removeItem("hasVisited");
-          location.reload();
-        }
-        isDevToolsOpen = nowOpen;
-      }, 1000);
-
-      checkAccess();
+    // 👁 First click = grant access, then lock future visits
+    centeredText.addEventListener("click", () => {
+      localStorage.setItem("hasVisited", "true");
+      welcomeScreen.style.display = "none";
+      imageViewer.style.display = "block";
     });
-  </script>
-</body>
-</html>
+  });
+</script>
